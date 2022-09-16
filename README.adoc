@@ -13,7 +13,7 @@ This library depends on ArduinoECCX08. This dependency could be
 disabled by defining ARDUINO_DISABLE_ECCX08 in ArduinoBearSSLConfig.h
 (see examples).
 
-Changes from original repo are reported in [changelog](./changelog.md)
+Changes from original repo are reported in link:changelog.md[changelog]
 
 == License ==
 
