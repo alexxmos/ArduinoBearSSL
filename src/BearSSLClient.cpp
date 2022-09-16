@@ -52,7 +52,7 @@ BearSSLClient::BearSSLClient(Client* client, const br_x509_trust_anchor* myTAs, 
   _ecChainLen(0)
 {
 #ifndef ARDUINO_DISABLE_ECCX08
-  _ecVrfy = eccX08_vrfy_asn1;
+  _ecVrfy = br_ecdsa_vrfy_asn1_get_default();//eccX08_vrfy_asn1;
   _ecSign = eccX08_sign_asn1;
 #else
   _ecVrfy = br_ecdsa_vrfy_asn1_get_default();
@@ -83,6 +83,11 @@ BearSSLClient::~BearSSLClient()
   }
 }
 
+void BearSSLClient::setTAs(const br_x509_trust_anchor* myTAs, int myNumTAs) {
+  _TAs = myTAs;
+  _numTAs = myNumTAs;
+}
+
 int BearSSLClient::connect(IPAddress ip, uint16_t port)
 {
   if (!_client->connect(ip, port)) {
@@ -94,7 +99,9 @@ int BearSSLClient::connect(IPAddress ip, uint16_t port)
 
 int BearSSLClient::connect(const char* host, uint16_t port)
 {
+  log_d("Connect to %s:%u", host, port);
   if (!_client->connect(host, port)) {
+    log_e("Couldn't connect\n");
     return 0;
   }
 
@@ -111,7 +118,7 @@ size_t BearSSLClient::write(const uint8_t *buf, size_t size)
   size_t written = 0;
 
   while (written < size) {
-    int result = br_sslio_write(&_ioc, buf, size - written);
+    int result = br_sslio_write(&_ioc, buf, size);
 
     if (result < 0) {
       break;
@@ -252,7 +259,7 @@ void BearSSLClient::setEccSlot(int ecc508KeySlot, const byte cert[], int certLen
   _ecCertDynamic = false;
 
 #ifndef ARDUINO_DISABLE_ECCX08
-  _ecVrfy = eccX08_vrfy_asn1;
+  _ecVrfy = br_ecdsa_vrfy_asn1_get_default(); //eccX08_vrfy_asn1;
   _ecSign = eccX08_sign_asn1;
 #else
   _ecVrfy = br_ecdsa_vrfy_asn1_get_default();

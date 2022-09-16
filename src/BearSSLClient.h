@@ -30,7 +30,8 @@
 #endif
 
 #ifndef BEAR_SSL_CLIENT_IBUF_SIZE
-#define BEAR_SSL_CLIENT_IBUF_SIZE 8192 + 85 + 325 - BEAR_SSL_CLIENT_OBUF_SIZE
+// #define BEAR_SSL_CLIENT_IBUF_SIZE 8192 + 85 + 325 - BEAR_SSL_CLIENT_OBUF_SIZE
+#define BEAR_SSL_CLIENT_IBUF_SIZE 16709 // as per bearssl specs
 #endif
 
 #ifndef BEAR_SSL_CLIENT_CHAIN_SIZE
@@ -72,6 +73,8 @@ public:
   enum class SNI {
     Insecure
   };
+
+  void setTAs(const br_x509_trust_anchor* myTAs, int myNumTAs);
 
   void setInsecure(SNI insecure) __attribute__((deprecated("INSECURE. DO NOT USE IN PRODUCTION")));
 
