@@ -1,7 +1,7 @@
 # BearSSL - QL changes
 ArduinoECCX08@1.3.6 at the time of copying to local lib.  
 
-1. Comment out line 50 at .pio/libdeps/arduino-esp32-bearssl/ArduinoBearSSL/src/SHA1.h
+1. Comment out line 50 at .pio/libdeps/arduino-esp32-bearssl/ArduinoBearSSL/src/SHA1.h. This singleton causes collisions with the ESP32 core package.
 2. The verify function from the ECC608 has some problems. In file BearSSLClient.cpp replace as below:
 ```c++
 // At lines 55 and 260 replace:
@@ -9,7 +9,7 @@ _ecVrfy = eccX08_vrfy_asn1;
 // With:
 _ecVrfy = br_ecdsa_vrfy_asn1_get_default(); 
 ```
-3. To save stack memory only one instace of BearSSLClient is used for the QuarkLink object. This involve adding the following method to BearSSLClient class:
+3. To save stack memory only one instace of BearSSLClient is used through the project. This involve adding the following method to BearSSLClient class:
 ```c++
 void BearSSLClient::setTAs(const br_x509_trust_anchor* myTAs, int myNumTAs) {
   _TAs = myTAs;
@@ -20,12 +20,10 @@ and the declaration to the .h file
 ```c++
 void setTAs(const br_x509_trust_anchor* myTAs, int myNumTAs);
 ```
-4. The default input buffer of BearSSL is too small for the firmware update. Increase its size in BearSSLClient.h, line #33:
+4. The default input buffer of BearSSL is too small for the firmware update.   
+Increase its size as 
 ```c++
-//#define BEAR_SSL_CLIENT_IBUF_SIZE 8192 + 85 + 325 - BEAR_SSL_CLIENT_OBUF_SIZE
-/* 16405 bytes is the minimum size for a successfull fw update. Not tested with different firmwares, so it may vary?
- * Can't be too large (e.g 32768) as it does not fit and it fails build */
-#define BEAR_SSL_CLIENT_IBUF_SIZE 16709 // slightly larger than minimum to be on the safe side
+#define BEAR_SSL_CLIENT_IBUF_SIZE 16709 // as per bearssl.org specs
 ```
 
 From the og project of [bearssl](https://www.bearssl.org/api1.html):
