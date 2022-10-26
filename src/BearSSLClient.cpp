@@ -99,9 +99,7 @@ int BearSSLClient::connect(IPAddress ip, uint16_t port)
 
 int BearSSLClient::connect(const char* host, uint16_t port)
 {
-  log_d("Connect to %s:%u", host, port);
   if (!_client->connect(host, port)) {
-    log_e("Couldn't connect\n");
     return 0;
   }
 
